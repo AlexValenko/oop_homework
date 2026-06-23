@@ -1,8 +1,7 @@
-from unittest.mock import patch, mock_open
+import json
+from unittest.mock import mock_open, patch
 
 from src.utils import create_objects_from_json, read_json
-import json
-
 
 
 def test_read_json_missing_path() -> None:
@@ -10,7 +9,8 @@ def test_read_json_missing_path() -> None:
     data_json = read_json("missing_path")
     assert data_json == []
 
-def test_read_json_success():
+
+def test_read_json_success() -> None:
     """Тест успешного считывания JSON-файла"""
     # Тестовые данные
     test_data = [{"name": "Product 1", "price": 100}, {"name": "Product 2", "price": 200}]
@@ -24,13 +24,14 @@ def test_read_json_success():
     assert result[0]["name"] == "Product 1"
 
 
-def test_read_json_invalid_json():
+def test_read_json_invalid_json() -> None:
     """Тест обработки повреждённого JSON-файла"""
     with patch("builtins.open", mock_open(read_data="невалидный json {]")):
         with patch("json.load", side_effect=json.JSONDecodeError("Invalid JSON", "test.json", 0)):
             result = read_json("corrupted.json")
 
     assert result == []
+
 
 def test_create_objects_from_json(get_data_from_json) -> None:
     """Тестирование корректного создания объектов из файла json"""

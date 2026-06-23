@@ -1,3 +1,6 @@
+from typing import Any
+
+
 class Product:
     """Класс описывает продукты магазина с их ценой и количеством"""
 
@@ -5,11 +8,12 @@ class Product:
     description: str
     price: float
     quantity: int
+    prod_list: list
 
     # Список для хранения всех инициализированных товаров
     prod_list = []
 
-    def __init__(self, name: str, description: str, price: float, quantity: int):
+    def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
         """Метод для инициализации экземпляров класса Product - все атрибуты задаются при инициализации"""
         self.name = name
         self.description = description
@@ -18,11 +22,12 @@ class Product:
         Product.prod_list.append(self)
 
     @classmethod
-    def new_product(cls, prod_dict):
-        """Метод принимает на вход словарь, в котором ключи соответствуют атрибутам экземпляра класса. Создает экземпляр класса.
-        Метод выполняет проверку имеются ли экземпляры с совпадающим полем name. Если продукт с таким именем существует, то
-        в существующем экземпляре добавляется количество товаров и актуализируется цена (берется наибольшая).
-        Если продукта с таким именем нет, то создается новый экземпляр класса (Продукт)"""
+    def new_product(cls, prod_dict: dict[str, Any]) -> "Product":
+        """Метод принимает на вход словарь, в котором ключи соответствуют атрибутам экземпляра класса.
+        Создает экземпляр класса. Выполняет проверку имеются ли экземпляры с совпадающим полем name.
+        Если продукт с таким именем существует, то в существующем экземпляре добавляется количество товаров
+        и актуализируется цена (берется наибольшая). Если продукта с таким именем нет,
+        то создается новый экземпляр класса (Продукт)"""
 
         name = prod_dict.get("name")
         description = prod_dict.get("description")
@@ -38,15 +43,14 @@ class Product:
 
         new_prod = cls(name=name, description=description, price=price, quantity=quantity)
 
-        # cls.prod_list.append(new_prod)
         return new_prod
 
     @property
-    def price(self):
+    def price(self) -> float:
         return self.__price
 
     @price.setter
-    def price(self, new_price):
+    def price(self, new_price: float) -> None:
         if new_price <= 0:
             print("Цена не должна быть нулевая или отрицательная")
             return
@@ -62,9 +66,6 @@ class Product:
             self.__price = new_price
 
 
-
-
-
 class Category:
     """Класс описывает категории товаров. Атрибуты класса Category считают количество категорий и количество товаров"""
 
@@ -75,7 +76,7 @@ class Category:
     category_count = 0
     product_count = 0
 
-    def __init__(self, name: str, description: str, products: list):
+    def __init__(self, name: str, description: str, products: list) -> None:
         """Метод для инициализации экземпляров класса Category - атрибуты экземпляра задаются при инициализации.
         Атрибуты класса: количество категорий и количество товаров обновляются при новой инициализации"""
         self.name = name
@@ -84,20 +85,17 @@ class Category:
         Category.category_count += 1
         Category.product_count += len(products)
 
-
-    def add_product(self, product: Product):
+    def add_product(self, product: Product) -> None:
         self.__products.append(product)
         Category.product_count += 1
 
     @property
-    def products(self):
-        result = ''
+    def products(self) -> str:
+        result = ""
         for prod in self.__products:
-            result += f'{prod.name}, {prod.price} руб. Остаток: {prod.quantity} шт.\n'
+            result += f"{prod.name}, {prod.price} руб. Остаток: {prod.quantity} шт.\n"
         return result
 
     @property
-    def products_in_list(self):
+    def products_in_list(self) -> list[Product]:
         return self.__products
-
-
