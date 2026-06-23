@@ -47,10 +47,15 @@ class Product:
 
     @property
     def price(self) -> float:
+        """Геттер для приватного атрибута price. Возвращает стоимость товара"""
         return self.__price
 
     @price.setter
     def price(self, new_price: float) -> None:
+        """Сеттер для приватного атрибута price. Реализует проверку: в случае если цена равна или ниже нуля,
+        выводите предупреждение в консоль, не изменяя цену товара. В случае если цена товара понижается,
+        запрашивается подтверждение пользователя вручную через ввод:
+        y (yes) или любой непустой ввод (no) для согласия понизить цену или для отмены действия соответственно."""
         if new_price <= 0:
             print("Цена не должна быть нулевая или отрицательная")
             return
@@ -86,11 +91,15 @@ class Category:
         Category.product_count += len(products)
 
     def add_product(self, product: Product) -> None:
+        """Метод для добавления товаров в категорию, принимает на вход объект класса
+        Product и записывает его в приватный атрибут списка товаров"""
         self.__products.append(product)
         Category.product_count += 1
 
     @property
     def products(self) -> str:
+        """Геттер для атрибута products, возвращает список товаров в виде строк в формате:
+        <Название продукта>, <Цена> руб. Остаток: <Количество> шт."""
         result = ""
         for prod in self.__products:
             result += f"{prod.name}, {prod.price} руб. Остаток: {prod.quantity} шт.\n"
@@ -98,4 +107,5 @@ class Category:
 
     @property
     def products_in_list(self) -> list[Product]:
+        """Геттер для атрибута products, возвращает список товаров в виде объектов класса Product"""
         return self.__products
