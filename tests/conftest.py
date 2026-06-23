@@ -2,12 +2,25 @@ import pytest
 
 from src.products import Category, Product
 
+@pytest.fixture(autouse=True)
+def reset_product_list():
+    Product.prod_list.clear()
+    yield
+
+
 
 @pytest.fixture
 def get_test_product():
     prod_1 = Product(name="Product 1", description="Some Product 1", price=100.0, quantity=10)
     return prod_1
 
+
+@pytest.fixture
+def get_product_from_dict():
+    prod_2 = Product.new_product(
+        {"name": "Phone", "description": "some description", "price": 2000,
+         "quantity": 5})
+    return prod_2
 
 @pytest.fixture
 def get_test_category():

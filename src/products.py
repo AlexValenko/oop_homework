@@ -23,14 +23,22 @@ class Product:
         Метод выполняет проверку имеются ли экземпляры с совпадающим полем name. Если продукт с таким именем существует, то
         в существующем экземпляре добавляется количество товаров и актуализируется цена (берется наибольшая).
         Если продукта с таким именем нет, то создается новый экземпляр класса (Продукт)"""
-        new_prod = cls(name=prod_dict.get("name"), description=prod_dict.get("description"), price=prod_dict.get("price"), quantity=prod_dict.get("quantity"))
+
+        name = prod_dict.get("name")
+        description = prod_dict.get("description")
+        price = prod_dict.get("price")
+        quantity = prod_dict.get("quantity")
+
         for prod in cls.prod_list:
-            if prod.name == new_prod.name:
-                prod.quantity += new_prod.quantity
-                if new_prod.price > prod.price:
-                    prod.price = new_prod.price
+            if prod.name == name:
+                prod.quantity += quantity
+                if price > prod.price:
+                    prod.price = price
                 return prod
-        cls.prod_list.append(new_prod)
+
+        new_prod = cls(name=name, description=description, price=price, quantity=quantity)
+
+        # cls.prod_list.append(new_prod)
         return new_prod
 
     @property
@@ -39,18 +47,20 @@ class Product:
 
     @price.setter
     def price(self, new_price):
-        if new_price > 0:
-            if new_price < self.__price:
-                print("Вы уверены, что хотите снизить цену?")
-                user_verifications = input('Да - введите "y", нет - любой непустой ввод \n').strip().lower()
-                if user_verifications == "y":
-                    self.__price = new_price
-                else:
-                    print("Цена не была изменена")
-
-            self.__price = new_price
-        else:
+        if new_price <= 0:
             print("Цена не должна быть нулевая или отрицательная")
+            return
+
+        if new_price < self.__price:
+            print("Вы уверены, что хотите снизить цену?")
+            user_verifications = input('Да - введите "y", нет - любой непустой ввод \n').strip().lower()
+            if user_verifications == "y":
+                self.__price = new_price
+            else:
+                print("Цена не была изменена")
+        else:
+            self.__price = new_price
+
 
 
 
@@ -74,9 +84,6 @@ class Category:
         Category.category_count += 1
         Category.product_count += len(products)
 
-    # @property
-    # def products(self) -> list:
-    #     return self.__products
 
     def add_product(self, product: Product):
         self.__products.append(product)
@@ -88,5 +95,9 @@ class Category:
         for prod in self.__products:
             result += f'{prod.name}, {prod.price} руб. Остаток: {prod.quantity} шт.\n'
         return result
+
+    @property
+    def products_in_list(self):
+        return self.__products
 
 

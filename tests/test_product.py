@@ -1,4 +1,5 @@
 from src.products import Category, Product
+from unittest.mock import patch
 
 
 def test_product_init(get_test_product) -> None:
@@ -8,14 +9,96 @@ def test_product_init(get_test_product) -> None:
     assert get_test_product.price == 100.00
     assert get_test_product.quantity == 10
 
+def test_prod_list_count(get_test_product) -> None:
+    """Проверка, что атрибут на уровне класса prod_list корректно сохраняет товары
+    при инициализации в список, и обновляется при добавлении товаров"""
+    assert len(Product.prod_list) == 1
+    Product(name="Product 2", description="Some Product 2", price=200.0, quantity=20)
+    assert len(Product.prod_list) == 2
+
+
+def test_product_new_product(get_product_from_dict):
+    """Тестирование возможности создания экземпляра класса через classmethod new_product,
+    со словарем на входе."""
+    assert get_product_from_dict.name == "Phone"
+    # Добавляем еще один продукт, проверяем геттер price
+    prod_3 = Product.new_product(
+        {"name": "Watch", "description": "description watch", "price": 1000,
+         "quantity": 10})
+    assert prod_3.price == 1000
+    assert len(Product.prod_list) == 2
+
+def test_product_double_product() -> None:
+    """Тестирование логики при совпадении названия продукта"""
+    prod_4 = Product.new_product(
+        {"name": "Test", "description": "test description", "price": 1000,
+         "quantity": 2})
+    assert prod_4.name == "Test"
+    assert len(Product.prod_list) == 1
+    # Добавляем еще один продукт, название которого совпадает с существующим, цена выше
+    prod_5 = Product.new_product(
+        {"name": "Test", "description": "test description", "price": 1200,
+         "quantity": 3})
+    # Количество товаров не должно измениться, цена обновляется, кол-во суммируется
+    assert len(Product.prod_list) == 1
+    assert prod_4.price == 1200
+    assert prod_4.quantity == 5
+    # Добавляем еще один продукт, название которого совпадает с существующим, цена ниже
+    prod_6 = Product.new_product(
+        {"name": "Test", "description": "test description", "price": 800,
+         "quantity": 4})
+    # Количество товаров не должно измениться, цена остается прежней, кол-во суммируется
+    assert len(Product.prod_list) == 1
+    assert prod_4.price == 1200
+    assert prod_4.quantity == 9
+
+def test_product_price_setter_below_zero(get_test_product, capsys) -> None:
+    """Проверка логики сеттера при изменении цены продукта на некорректное значение"""
+    # Проверяем создание объекта
+    prod_1 = get_test_product
+    assert prod_1.name == "Product 1"
+    assert prod_1.price == 100.0
+    prod_1.price = -100.00
+    captured = capsys.readouterr()
+    assert "Цена не должна быть нулевая или отрицательная" in captured.out
+    assert prod_1.price == 100.0
+
+def test_product_price_setter_upper(get_test_product) -> None:
+    """Проверка логики сеттера при изменении цены продукта в бо́льшую сторону"""
+    # Проверяем создание объекта
+    prod_1 = get_test_product
+    assert prod_1.name == "Product 1"
+    assert prod_1.price == 100.0
+    prod_1.price = 200.0
+    assert prod_1.price == 200.0
+
+def test_product_price_setter_lower(get_test_product, capsys) -> None:
+    """Проверка логики сеттера при изменении цены продукта в меньшую сторону"""
+    # Проверяем создание объекта
+    prod_1 = get_test_product
+    assert prod_1.name == "Product 1"
+    assert prod_1.price == 100.0
+
+    with patch('builtins.input', return_value='y'):
+        prod_1.price = 50.0
+        assert prod_1.price == 50.0
+
+    with patch('builtins.input', return_value='n'):
+        prod_1.price = 10.0
+        captured = capsys.readouterr()
+        assert prod_1.price == 50.0
+        assert "Цена не была изменена" in captured.out
+
+
 
 def test_category_init(get_test_category) -> None:
-    """Тестирование корректной инициализации объекта класса Category"""
+    """Тестирование корректной инициализации объекта класса Category, тестирование геттера products"""
     assert get_test_category.name == "cat_1"
     assert get_test_category.description == "Something about cat_1"
-    assert len(get_test_category.products) == 3
+    assert len(get_test_category.products_in_list) == 3
     assert Category.category_count == 1
     assert Category.product_count == 3
+    assert get_test_category.products == "PC1, 10.0 руб. Остаток: 5 шт.\nPC2, 20.0 руб. Остаток: 5 шт.\nPC3, 30.0 руб. Остаток: 5 шт.\n"
 
 
 def test_category_add_new_category() -> None:
@@ -30,3 +113,13 @@ def test_category_add_new_category() -> None:
     )
     assert Category.category_count == 2  # 1 - при вызове фикстуры в предыдущем тесте + 1 из объекта cat_2
     assert Category.product_count == 5  # 3 - при вызове фикстуры в предыдущем тесте + 2 из объекта cat_2
+
+def test_category_add_product(get_test_category) -> None:
+    """Проверка метода (add_product) добавления продуктов в категорию"""
+    current_prod_count = Category.product_count
+
+    new_product = Product(name="PC555", description="PC-555", price=55.5, quantity=55)
+    get_test_category.add_product(new_product)
+
+    assert Category.product_count == current_prod_count + 1
+    assert "PC555" in get_test_category.products
