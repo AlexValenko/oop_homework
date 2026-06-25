@@ -136,3 +136,28 @@ class Category:
     def products_in_list(self) -> list[Product]:
         """Геттер для атрибута products, возвращает список товаров в виде объектов класса Product"""
         return self.__products
+
+
+class IterProducts:
+    """Класс позволяет перебирать товары одной категории, например в цикле for.
+    Принимает на вход объект класса категории и производит итерацию по товарам, которые хранятся в данной категории"""
+
+    def __init__(self, category):
+        """Инициализация объекта класса IterProducts на входе объект - class Category"""
+        if not isinstance(category, Category):
+            raise ValueError("Экземпляр класса IterProducts может принимать только объект класса Category")
+        self.category_obj = category
+        self._index = 0
+
+    def __iter__(self):
+        self._index = 0
+        return self
+
+
+    def __next__(self):
+        products = self.category_obj.products_in_list
+        if self._index >= len(products):
+            raise StopIteration
+        current_product = products[self._index]
+        self._index += 1
+        return current_product

@@ -1,4 +1,4 @@
-from src.products import Product, Category
+from src.products import Product, Category, IterProducts
 
 if __name__ == '__main__':
     product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
@@ -20,8 +20,15 @@ if __name__ == '__main__':
     print()
 
     print(category1.products)
-    print()
 
     print(product1 + product2)
     print(product1 + product3)
     print(product2 + product3)
+
+    print()
+    print("Итератор продуктов в категории")
+    items = IterProducts(category1)
+    print(next(items))
+    print(next(items))
+    print(next(items))
+

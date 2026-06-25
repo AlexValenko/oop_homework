@@ -1,6 +1,8 @@
 from unittest.mock import patch
 
-from src.products import Category, Product
+import pytest
+
+from src.products import Category, Product, IterProducts
 
 
 def test_product_init(get_test_product) -> None:
@@ -151,3 +153,27 @@ def test_category_add_product(get_test_category) -> None:
 
     assert Category.product_count == current_prod_count + 1
     assert "PC555" in get_test_category.products
+
+def test_iter_products_init_success(get_test_category):
+    """Успешная инициализация объекта класса IterProducts"""
+    my_iterator = IterProducts(get_test_category)
+    assert my_iterator.category_obj.name == "cat_1"
+    assert len(my_iterator.category_obj.products_in_list) == 3
+
+    # Тестирование итератора
+
+    result_1 = next(my_iterator)
+    assert result_1.name == "PC1"
+    result_2 = next(my_iterator)
+    assert result_2.description == "PC-2"
+    result_3 = next(my_iterator)
+    assert result_3.price == 30.0
+    with pytest.raises(StopIteration):
+        next(my_iterator)
+
+def test_iter_products_init_failed():
+    """Инициализация объекта класса IterProducts с некорректным объектом на входе"""
+    with pytest.raises(ValueError) as e:
+        IterProducts("Some-string - not Category object")
+
+    assert str(e.value) == "Экземпляр класса IterProducts может принимать только объект класса Category"
