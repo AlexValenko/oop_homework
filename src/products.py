@@ -21,6 +21,17 @@ class Product:
         self.quantity = quantity
         Product.prod_list.append(self)
 
+    def __str__(self):
+        """Выводит строковое отображение экземпляра класса в виде
+        <Название продукта>, <Цена> руб. Остаток: <Количество> шт."""
+        return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
+
+    def __add__(self, other):
+        """При сложении экземпляров класса Product выдает полную стоимость товаров на складе
+        (стоимость * количество товара 1) + (стоимость * количество товара 2)"""
+        return self.__price * self.quantity + other.__price * other.quantity
+
+
     @classmethod
     def new_product(cls, prod_dict: dict[str, Any]) -> "Product":
         """Метод принимает на вход словарь, в котором ключи соответствуют атрибутам экземпляра класса.
@@ -89,6 +100,16 @@ class Category:
         self.__products = products if products else []
         Category.category_count += 1
         Category.product_count += len(products)
+
+    def __str__(self):
+        """Вычисляет общее количество товаров в категории, возвращает результат в виде строки
+        <Название категории>, количество продуктов: <количество> шт."""
+        product_list = self.__products
+        total_products_count = 0
+        for product in product_list:
+            total_products_count += product.quantity
+        return f"{self.name}, количество продуктов: {total_products_count} шт."
+
 
     def add_product(self, product: Product) -> None:
         """Метод для добавления товаров в категорию, принимает на вход объект класса
