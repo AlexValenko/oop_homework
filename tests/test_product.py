@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
-from src.products import Category, Product, IterProducts
+from src.products import Category, IterProducts, Product
 
 
 def test_product_init(get_test_product) -> None:
@@ -117,7 +117,7 @@ def test_category_init(get_test_category) -> None:
     )
 
 
-def test_category_string(get_test_category):
+def test_category_string(get_test_category) -> None:
     """Тестирование строкового отображения экземпляра класса Category (метод __str__)"""
     result_1 = str(get_test_category)
     assert result_1 == "cat_1, количество продуктов: 15 шт."
@@ -154,7 +154,8 @@ def test_category_add_product(get_test_category) -> None:
     assert Category.product_count == current_prod_count + 1
     assert "PC555" in get_test_category.products
 
-def test_iter_products_init_success(get_test_category):
+
+def test_iter_products_init_success(get_test_category) -> None:
     """Успешная инициализация объекта класса IterProducts"""
     my_iterator = IterProducts(get_test_category)
     assert my_iterator.category_obj.name == "cat_1"
@@ -171,7 +172,8 @@ def test_iter_products_init_success(get_test_category):
     with pytest.raises(StopIteration):
         next(my_iterator)
 
-def test_iter_products_init_failed():
+
+def test_iter_products_init_failed() -> None:
     """Инициализация объекта класса IterProducts с некорректным объектом на входе"""
     with pytest.raises(ValueError) as e:
         IterProducts("Some-string - not Category object")

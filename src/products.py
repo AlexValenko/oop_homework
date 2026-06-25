@@ -34,7 +34,6 @@ class Product:
         else:
             return 0
 
-
     @classmethod
     def new_product(cls, prod_dict: dict[str, Any]) -> "Product":
         """Метод принимает на вход словарь, в котором ключи соответствуют атрибутам экземпляра класса.
@@ -116,7 +115,6 @@ class Category:
                 total_products_count += product.quantity
         return f"{self.name}, количество продуктов: {total_products_count} шт."
 
-
     def add_product(self, product: Product) -> None:
         """Метод для добавления товаров в категорию, принимает на вход объект класса
         Product и записывает его в приватный атрибут списка товаров"""
@@ -152,7 +150,6 @@ class IterProducts:
     def __iter__(self):
         self._index = 0
         return self
-
 
     def __next__(self):
         products = self.category_obj.products_in_list
