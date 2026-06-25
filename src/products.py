@@ -29,7 +29,10 @@ class Product:
     def __add__(self, other):
         """При сложении экземпляров класса Product выдает полную стоимость товаров на складе
         (стоимость * количество товара 1) + (стоимость * количество товара 2)"""
-        return self.__price * self.quantity + other.__price * other.quantity
+        if self.__price > 0 and self.quantity > 0 and other.__price > 0 and other.quantity > 0:
+            return self.__price * self.quantity + other.__price * other.quantity
+        else:
+            return 0
 
 
     @classmethod
@@ -107,7 +110,10 @@ class Category:
         product_list = self.__products
         total_products_count = 0
         for product in product_list:
-            total_products_count += product.quantity
+            if product.quantity <= 0:
+                continue
+            if isinstance(product.quantity, int):
+                total_products_count += product.quantity
         return f"{self.name}, количество продуктов: {total_products_count} шт."
 
 
