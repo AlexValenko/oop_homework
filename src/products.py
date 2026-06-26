@@ -21,6 +21,19 @@ class Product:
         self.quantity = quantity
         Product.prod_list.append(self)
 
+    def __str__(self):
+        """Выводит строковое отображение экземпляра класса в виде
+        <Название продукта>, <Цена> руб. Остаток: <Количество> шт."""
+        return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
+
+    def __add__(self, other):
+        """При сложении экземпляров класса Product выдает полную стоимость товаров на складе
+        (стоимость * количество товара 1) + (стоимость * количество товара 2)"""
+        if self.__price > 0 and self.quantity > 0 and other.__price > 0 and other.quantity > 0:
+            return self.__price * self.quantity + other.__price * other.quantity
+        else:
+            return 0
+
     @classmethod
     def new_product(cls, prod_dict: dict[str, Any]) -> "Product":
         """Метод принимает на вход словарь, в котором ключи соответствуют атрибутам экземпляра класса.
@@ -90,6 +103,18 @@ class Category:
         Category.category_count += 1
         Category.product_count += len(products)
 
+    def __str__(self):
+        """Вычисляет общее количество товаров в категории, возвращает результат в виде строки
+        <Название категории>, количество продуктов: <количество> шт."""
+        product_list = self.__products
+        total_products_count = 0
+        for product in product_list:
+            if product.quantity <= 0:
+                continue
+            if isinstance(product.quantity, int):
+                total_products_count += product.quantity
+        return f"{self.name}, количество продуктов: {total_products_count} шт."
+
     def add_product(self, product: Product) -> None:
         """Метод для добавления товаров в категорию, принимает на вход объект класса
         Product и записывает его в приватный атрибут списка товаров"""
@@ -109,3 +134,27 @@ class Category:
     def products_in_list(self) -> list[Product]:
         """Геттер для атрибута products, возвращает список товаров в виде объектов класса Product"""
         return self.__products
+
+
+class IterProducts:
+    """Класс позволяет перебирать товары одной категории, например в цикле for.
+    Принимает на вход объект класса категории и производит итерацию по товарам, которые хранятся в данной категории"""
+
+    def __init__(self, category):
+        """Инициализация объекта класса IterProducts на входе объект - class Category"""
+        if not isinstance(category, Category):
+            raise ValueError("Экземпляр класса IterProducts может принимать только объект класса Category")
+        self.category_obj = category
+        self._index = 0
+
+    def __iter__(self):
+        self._index = 0
+        return self
+
+    def __next__(self):
+        products = self.category_obj.products_in_list
+        if self._index >= len(products):
+            raise StopIteration
+        current_product = products[self._index]
+        self._index += 1
+        return current_product

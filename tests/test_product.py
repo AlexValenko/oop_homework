@@ -1,6 +1,8 @@
 from unittest.mock import patch
 
-from src.products import Category, Product
+import pytest
+
+from src.products import Category, IterProducts, Product
 
 
 def test_product_init(get_test_product) -> None:
@@ -9,6 +11,20 @@ def test_product_init(get_test_product) -> None:
     assert get_test_product.description == "Some Product 1"
     assert get_test_product.price == 100.00
     assert get_test_product.quantity == 10
+
+
+def test_product_string(get_test_product):
+    """Тестирование строкового отображения экземпляра класса Product (метод __str__)"""
+    assert str(get_test_product) == "Product 1, 100.0 руб. Остаток: 10 шт."
+
+
+def test_additions_products(get_test_product, get_product_from_dict):
+    """Тестирование результата сложения экземпляров класса Product (метод __add__)"""
+    result_1 = get_test_product + get_product_from_dict
+    assert result_1 == 11000.0
+    # Если количество товара = 0
+    product_3 = Product(name="Product 3", description="Some Product 3", price=300.0, quantity=0)
+    assert get_test_product + product_3 == 0.0
 
 
 def test_prod_list_count(get_test_product) -> None:
@@ -101,8 +117,21 @@ def test_category_init(get_test_category) -> None:
     )
 
 
+def test_category_string(get_test_category) -> None:
+    """Тестирование строкового отображения экземпляра класса Category (метод __str__)"""
+    result_1 = str(get_test_category)
+    assert result_1 == "cat_1, количество продуктов: 15 шт."
+    # Добавляем продукт с нулевым количеством товаров
+    new_product = Product(name="PC555", description="PC-555", price=55.5, quantity=0)
+    get_test_category.add_product(new_product)
+    result_2 = str(get_test_category)
+    assert result_2 == "cat_1, количество продуктов: 15 шт."
+
+
 def test_category_add_new_category() -> None:
     """Проверка атрибутов класса Category при добавлении новой категории и двух новых продуктов"""
+    cat_count_start = Category.category_count
+    prod_count_start = Category.product_count
     Category(
         name="cat_2",
         description="Something about cat_2",
@@ -111,8 +140,8 @@ def test_category_add_new_category() -> None:
             Product(name="PC22", description="PC-22", price=20.0, quantity=5),
         ],
     )
-    assert Category.category_count == 2  # 1 - при вызове фикстуры в предыдущем тесте + 1 из объекта cat_2
-    assert Category.product_count == 5  # 3 - при вызове фикстуры в предыдущем тесте + 2 из объекта cat_2
+    assert Category.category_count == cat_count_start + 1  # добавлена 1 категория
+    assert Category.product_count == prod_count_start + 2  # Добавлено 2 продукта
 
 
 def test_category_add_product(get_test_category) -> None:
@@ -124,3 +153,29 @@ def test_category_add_product(get_test_category) -> None:
 
     assert Category.product_count == current_prod_count + 1
     assert "PC555" in get_test_category.products
+
+
+def test_iter_products_init_success(get_test_category) -> None:
+    """Успешная инициализация объекта класса IterProducts"""
+    my_iterator = IterProducts(get_test_category)
+    assert my_iterator.category_obj.name == "cat_1"
+    assert len(my_iterator.category_obj.products_in_list) == 3
+
+    # Тестирование итератора
+
+    result_1 = next(my_iterator)
+    assert result_1.name == "PC1"
+    result_2 = next(my_iterator)
+    assert result_2.description == "PC-2"
+    result_3 = next(my_iterator)
+    assert result_3.price == 30.0
+    with pytest.raises(StopIteration):
+        next(my_iterator)
+
+
+def test_iter_products_init_failed() -> None:
+    """Инициализация объекта класса IterProducts с некорректным объектом на входе"""
+    with pytest.raises(ValueError) as e:
+        IterProducts("Some-string - not Category object")
+
+    assert str(e.value) == "Экземпляр класса IterProducts может принимать только объект класса Category"
