@@ -27,8 +27,9 @@ class Product:
         return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
 
     def __add__(self, other):
-        """При сложении экземпляров класса Product выдает полную стоимость товаров на складе
-        (стоимость * количество товара 1) + (стоимость * количество товара 2)"""
+        """При сложении экземпляров класса Product или дочерних выдает полную стоимость товаров на складе
+        (стоимость * количество товара 1) + (стоимость * количество товара 2)
+        Не позволяет складывать объекты разных классов, в т.ч. родственных"""
         if type(self) is not type(other):
             raise TypeError("Складывать можно только экземпляры одного класса")
         if self.__price > 0 and self.quantity > 0 and other.__price > 0 and other.quantity > 0:
@@ -120,8 +121,11 @@ class Category:
     def add_product(self, product: Product) -> None:
         """Метод для добавления товаров в категорию, принимает на вход объект класса
         Product и записывает его в приватный атрибут списка товаров"""
-        self.__products.append(product)
-        Category.product_count += 1
+        if isinstance(product, Product):
+            self.__products.append(product)
+            Category.product_count += 1
+        else:
+            raise TypeError
 
     @property
     def products(self) -> str:
