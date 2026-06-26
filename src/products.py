@@ -29,6 +29,8 @@ class Product:
     def __add__(self, other):
         """При сложении экземпляров класса Product выдает полную стоимость товаров на складе
         (стоимость * количество товара 1) + (стоимость * количество товара 2)"""
+        if type(self) is not type(other):
+            raise TypeError("Складывать можно только экземпляры одного класса")
         if self.__price > 0 and self.quantity > 0 and other.__price > 0 and other.quantity > 0:
             return self.__price * self.quantity + other.__price * other.quantity
         else:
