@@ -125,7 +125,7 @@ class Category:
             self.__products.append(product)
             Category.product_count += 1
         else:
-            raise TypeError
+            raise TypeError("Можно добавлять только товары класса Product и дочерних")
 
     @property
     def products(self) -> str:

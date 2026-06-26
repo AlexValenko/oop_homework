@@ -18,13 +18,29 @@ def test_product_string(get_test_product):
     assert str(get_test_product) == "Product 1, 100.0 руб. Остаток: 10 шт."
 
 
-def test_additions_products(get_test_product, get_product_from_dict):
+def test_additions_products(get_test_product, get_product_from_dict) -> None:
     """Тестирование результата сложения экземпляров класса Product (метод __add__)"""
     result_1 = get_test_product + get_product_from_dict
     assert result_1 == 11000.0
     # Если количество товара = 0
     product_3 = Product(name="Product 3", description="Some Product 3", price=300.0, quantity=0)
     assert get_test_product + product_3 == 0.0
+
+
+def test_additions_products_fail(get_test_product) -> None:
+    """Тестирование функции сложения экземпляров класса Product (метод __add__)
+    при попытке сложить экземпляры разных классов Product + string"""
+    with pytest.raises(TypeError) as exc_info:
+        get_test_product + "Some product string"
+    assert str(exc_info.value) == "Складывать можно только экземпляры одного класса"
+
+
+def test_additions_products_fail2(get_test_product, get_one_smartphone) -> None:
+    """Тестирование функции сложения экземпляров класса Product (метод __add__)
+    при попытке сложить экземпляры разных классов Product + Smartphone"""
+    with pytest.raises(TypeError) as exc_info:
+        get_test_product + get_one_smartphone
+    assert str(exc_info.value) == "Складывать можно только экземпляры одного класса"
 
 
 def test_prod_list_count(get_test_product) -> None:
@@ -153,6 +169,24 @@ def test_category_add_product(get_test_category) -> None:
 
     assert Category.product_count == current_prod_count + 1
     assert "PC555" in get_test_category.products
+
+
+def test_category_add_product_smartphone(get_test_category, get_one_smartphone) -> None:
+    """Проверка метода (add_product) добавления продуктов в категорию"""
+    current_prod_count = Category.product_count
+
+    get_test_category.add_product(get_one_smartphone)
+
+    assert Category.product_count == current_prod_count + 1
+    assert "Samsung Galaxy S23 Ultra" in get_test_category.products
+
+
+def test_category_add_product_fail(get_test_category) -> None:
+    """Проверка метода (add_product) добавления продуктов в категорию в случае,
+    если продукт не является объектом текущего или дочернего класса"""
+    with pytest.raises(TypeError) as exc_info:
+        get_test_category.add_product("Some_product")
+    assert str(exc_info.value) == "Можно добавлять только товары класса Product и дочерних"
 
 
 def test_iter_products_init_success(get_test_category) -> None:
