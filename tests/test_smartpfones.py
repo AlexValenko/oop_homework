@@ -18,11 +18,19 @@ def test_smartphone_init(get_one_smartphone) -> None:
     assert smartphone1.color == "Серый"
     assert issubclass(Smartphone, Product)
 
+
 def test_smartphone_init_quantity_below_zero() -> None:
     """Тестирование инициализации объекта класса Smartphone c отрицательным количеством"""
     with pytest.raises(ValueError) as exc_info:
         Smartphone(
-            "Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, -5, 95.5, "S23 Ultra", 256, "Серый"
+            "Samsung Galaxy S23 Ultra",
+            "256GB, Серый цвет, 200MP камера",
+            180000.0,
+            -5,
+            95.5,
+            "S23 Ultra",
+            256,
+            "Серый",
         )
     assert str(exc_info.value) == "Товар с нулевым количеством не может быть добавлен"
 

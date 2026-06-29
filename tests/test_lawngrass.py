@@ -17,6 +17,7 @@ def test_smartphone_init(get_one_lawngrass) -> None:
     assert grass1.color == "Зеленый"
     assert issubclass(LawnGrass, Product)
 
+
 def test_lawngrass_init_quantity_below_zero() -> None:
     """Тестирование инициализации объекта класса Smartphone c нулевым количеством"""
     with pytest.raises(ValueError) as exc_info:

@@ -172,9 +172,10 @@ def test_get_average_price_success(get_test_category) -> None:
     get_test_category.add_product(new_product)
     assert get_test_category.average_price() == 25.0
 
+
 def test_get_average_price_fail(get_test_category) -> None:
     """Тестирование метода получения средней цены товаров в категории - товары отсутствуют"""
-    empty_category = Category(name='empty_test', description='something', products=[])
+    empty_category = Category(name="empty_test", description="something", products=[])
     assert empty_category.average_price() == 0
 
 
