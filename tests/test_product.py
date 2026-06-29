@@ -13,6 +13,13 @@ def test_product_init(get_test_product) -> None:
     assert get_test_product.quantity == 10
 
 
+def test_product_init_quantity_zero() -> None:
+    """Тестирование инициализации товара с нулевым или отрицательным количеством"""
+    with pytest.raises(ValueError) as e:
+        Product(name="Product 3", description="Some Product 3", price=300.0, quantity=0)
+    assert str(e.value) == "Товар с нулевым количеством не может быть добавлен"
+
+
 def test_product_string(get_test_product):
     """Тестирование строкового отображения экземпляра класса Product (метод __str__)"""
     assert str(get_test_product) == "Product 1, 100.0 руб. Остаток: 10 шт."
@@ -22,9 +29,6 @@ def test_additions_products(get_test_product, get_product_from_dict) -> None:
     """Тестирование результата сложения экземпляров класса Product (метод __add__)"""
     result_1 = get_test_product + get_product_from_dict
     assert result_1 == 11000.0
-    # Если количество товара = 0
-    product_3 = Product(name="Product 3", description="Some Product 3", price=300.0, quantity=0)
-    assert get_test_product + product_3 == 0.0
 
 
 def test_additions_products_fail(get_test_product) -> None:
@@ -137,11 +141,11 @@ def test_category_string(get_test_category) -> None:
     """Тестирование строкового отображения экземпляра класса Category (метод __str__)"""
     result_1 = str(get_test_category)
     assert result_1 == "cat_1, количество продуктов: 15 шт."
-    # Добавляем продукт с нулевым количеством товаров
-    new_product = Product(name="PC555", description="PC-555", price=55.5, quantity=0)
+    # Добавляем продукт с количеством товаров 10 штук
+    new_product = Product(name="PC555", description="PC-555", price=55.5, quantity=10)
     get_test_category.add_product(new_product)
     result_2 = str(get_test_category)
-    assert result_2 == "cat_1, количество продуктов: 15 шт."
+    assert result_2 == "cat_1, количество продуктов: 25 шт."
 
 
 def test_category_add_new_category() -> None:
@@ -158,6 +162,21 @@ def test_category_add_new_category() -> None:
     )
     assert Category.category_count == cat_count_start + 1  # добавлена 1 категория
     assert Category.product_count == prod_count_start + 2  # Добавлено 2 продукта
+
+
+def test_get_average_price_success(get_test_category) -> None:
+    """Тестирование метода получения средней цены товаров в категории - успешный"""
+    assert get_test_category.average_price() == 20.0
+    # Добавим новый продукт для проверки нового результата
+    new_product = Product(name="PC4", description="PC-4", price=40, quantity=4)
+    get_test_category.add_product(new_product)
+    assert get_test_category.average_price() == 25.0
+
+
+def test_get_average_price_fail(get_test_category) -> None:
+    """Тестирование метода получения средней цены товаров в категории - товары отсутствуют"""
+    empty_category = Category(name="empty_test", description="something", products=[])
+    assert empty_category.average_price() == 0
 
 
 def test_category_add_product(get_test_category) -> None:
