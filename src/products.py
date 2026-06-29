@@ -125,6 +125,18 @@ class Category:
                 total_products_count += product.quantity
         return f"{self.name}, количество продуктов: {total_products_count} шт."
 
+
+    def average_price(self):
+        """Подсчитывает средний ценник всех товаров в категории. Если товаров в категории нет, возвращает ноль"""
+        product_sum = sum([product.price for product in self.__products])
+        product_count = len(self.__products)
+        try:
+            average_price = round(product_sum / product_count, 2)
+        except ZeroDivisionError:
+            average_price = 0
+        return average_price
+
+
     def add_product(self, product: Product) -> None:
         """Метод для добавления товаров в категорию, принимает на вход объект класса
         Product и записывает его в приватный атрибут списка товаров"""

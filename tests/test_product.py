@@ -164,6 +164,20 @@ def test_category_add_new_category() -> None:
     assert Category.product_count == prod_count_start + 2  # Добавлено 2 продукта
 
 
+def test_get_average_price_success(get_test_category) -> None:
+    """Тестирование метода получения средней цены товаров в категории - успешный"""
+    assert get_test_category.average_price() == 20.0
+    # Добавим новый продукт для проверки нового результата
+    new_product = Product(name="PC4", description="PC-4", price=40, quantity=4)
+    get_test_category.add_product(new_product)
+    assert get_test_category.average_price() == 25.0
+
+def test_get_average_price_fail(get_test_category) -> None:
+    """Тестирование метода получения средней цены товаров в категории - товары отсутствуют"""
+    empty_category = Category(name='empty_test', description='something', products=[])
+    assert empty_category.average_price() == 0
+
+
 def test_category_add_product(get_test_category) -> None:
     """Проверка метода (add_product) добавления продуктов в категорию"""
     current_prod_count = Category.product_count
